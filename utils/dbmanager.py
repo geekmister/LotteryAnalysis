@@ -19,20 +19,18 @@ class DBManager:
         )
         self.cursor = self.conn.cursor()
 
-
     def insert(self, sql):
         self.cursor.execute(sql)
         self.conn.commit()
-
 
     def queryone(self, sql):
         self.cursor.execute(sql)
         return self.cursor.fetchone()
 
-    
+    def queryall(self, sql):
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
+
     def close(self):
         self.cursor.close()
         self.conn.close()
-
-
-    

@@ -1,2 +1,9 @@
 # LotteryAnalysis
-I have a dream that win a prize in a lottory...
+
+我有一个梦想，那就是中一张彩票大奖！这个项目是爬取过往中奖记录并进行统计分析，彩票的中奖概率在理论上是完全随机的且不可预测的，所以那些讲使用 AI 工具预测或者摸某方式预测均属于骗人的行为，需理性看待...
+
+### 开源项目
+
+此项目主要使用到的开源项目：
+
+1. [kivy](https://github.com/kivy/kivy)

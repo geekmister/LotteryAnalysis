@@ -9,36 +9,44 @@ import utils.dbmanager as dbmanager
 def drawing_observation_of_number_distribution_analysis_chart():
     """
     :desc:
-        历史数据分析法-号码分布观察
-        分析历史开奖号码在各个区间的分布情况，例如将前区号码分为 01-12、13-24、25-35 等区间，
-        观察每个区间号码出现的频率，判断近期哪些区间可能是 “热区”，哪些是 “冷区”，从而在选号时进行合理搭配。
+        Historical Data Analysis Method - Number Distribution Observation
+        Analyse open prize number of history data distribution observation, ex: to divide front area number 01-12、13-24、25-35 three area interval,
+        Observal frequency even area number, Determnine which intervals are likely to be hot zones and which ones are cold zones in the recent periond.
+        So as to make reasonable combinations when choosing numbers. Intervals to divided are little, the analysis is more accurate.
     """
 
-    # 示例历史开奖数据，实际应用中需从数据源获取真实数据
+    # SECTION - Read history data open prize from database then package data structure
     db = dbmanager.DBManager()
     sql = "select * from t_bus_daletou"
     result_data = db.queryall(sql)
     db.close()
 
+    # NOTE - Package data structure as follows:
+    # lottery_data = [
+    #     [1, 5, 10, 20, 30],
+    #     [2, 6, 12, 22, 32],
+    #     [3, 7, 14, 24, 34],
+    #     [4, 8, 16, 26, 35],
+    #     [5, 9, 18, 28, 33]
+    # ]
     lottery_data = []
     for i in range(len(result_data)):
-        front_intervals_numbers = [result_data[i][2], result_data[i]
-                                   [3], result_data[i][4], result_data[i][5], result_data[i][6]]
+        front_intervals_numbers = [result_data[i][2], result_data[i][3], result_data[i][4], result_data[i][5], result_data[i][6]]
         back_intervals_numbers = [result_data[i][7], result_data[i][8]]
         open_result_numbers = (front_intervals_numbers, back_intervals_numbers)
         lottery_data.append(open_result_numbers)
 
-    # 前区号码区间划分
-    front_intervals = [(1, 12), (13, 24), (25, 35)]
-    # 后区号码区间划分
-    back_intervals = [(1, 4), (5, 8), (9, 12)]
+    # NOTE - The front area number interval division
+    front_intervals = [(1, 3), (4, 7), (8, 11), (12, 15), (16, 19), (20, 23), (24, 27), (28, 31), (32, 35)]
+    # NOTE - The back area number interval division
+    back_intervals = [(1, 2), (3, 4), (5, 6), (7, 8), (9, 10), (11, 12)]
 
     def count_numbers_in_intervals(data, intervals):
         """
-        统计每个区间内号码出现的次数
-        :param data: 开奖号码数据
-        :param intervals: 区间列表
-        :return: 每个区间的号码出现次数
+        :desc: Count the number of occurrences of each number within each interval.
+        :param data: Open prize number data
+        :param intervals: Interval list
+        :return: Count the number of occurrences of each number within each interval.
         """
         counter = Counter()
         for draw in data:
@@ -48,34 +56,32 @@ def drawing_observation_of_number_distribution_analysis_chart():
                         counter[i] += 1
         return counter
 
-    # 统计前区号码分布
+    # SECTION - Count the number of occurrences of each number within each interval.
+    # NOTE - Count distribution of the front area number.
     front_data = [draw[0] for draw in lottery_data]
     front_counter = count_numbers_in_intervals(front_data, front_intervals)
 
-    # 统计后区号码分布
+    # NOTE - Count distribution of the back area number. 
     back_data = [draw[1] for draw in lottery_data]
     back_counter = count_numbers_in_intervals(back_data, back_intervals)
 
-    # 绘制前区号码分布柱状图
+    # NOTE - Drawing bar graph of the front area number distribution.
     plt.figure(figsize=(12, 6))
-    plt.subplot(1, 2, 1)
-    plt.bar(range(len(front_intervals)), [
-            front_counter[i] for i in range(len(front_intervals))])
-    plt.xticks(range(len(front_intervals)), [
-        f"{start}-{end}" for start, end in front_intervals])
-    plt.xlabel('前区号码区间')
-    plt.ylabel('出现次数')
-    plt.title('前区号码分布')
 
-    # 绘制后区号码分布柱状图
+    plt.subplot(1, 2, 1)
+    plt.bar(range(len(front_intervals)), [front_counter[i] for i in range(len(front_intervals))])
+    plt.xticks(range(len(front_intervals)), [f"{start}-{end}" for start, end in front_intervals])
+    plt.xlabel('Front Area Number Interval')
+    plt.ylabel('Occurrence Number')
+    plt.title('Front Area Number Intercal Distribution')
+
+    # NOTE -Drawing bar graph of the back area number distribution.
     plt.subplot(1, 2, 2)
-    plt.bar(range(len(back_intervals)), [back_counter[i]
-            for i in range(len(back_intervals))])
-    plt.xticks(range(len(back_intervals)), [
-        f"{start}-{end}" for start, end in back_intervals])
-    plt.xlabel('后区号码区间')
-    plt.ylabel('出现次数')
-    plt.title('后区号码分布')
+    plt.bar(range(len(back_intervals)), [back_counter[i]for i in range(len(back_intervals))])
+    plt.xticks(range(len(back_intervals)), [f"{start}-{end}" for start, end in back_intervals])
+    plt.xlabel('Back Area Number Interval')
+    plt.ylabel('Occurrence Number')
+    plt.title('Back Area Number Intercal Distribution')
 
     plt.tight_layout()
     plt.show()
@@ -487,4 +493,5 @@ def drawing_analyze_interval_trend_analysis_chart():
     plt.show()
 
 if __name__ == '__main__':
+    drawing_observation_of_number_distribution_analysis_chart()
     pass

@@ -118896,3 +118896,50 @@
             )
 2025-03-23 07:17:24 - DEBUG - Starting new HTTPS connection (1): pdf.sporttery.cn:443
 2025-03-23 07:17:24 - DEBUG - https://pdf.sporttery.cn:443 "GET /33800/25030/25030.pdf HTTP/1.1" 200 53050
+2025-03-25 13:34:00 - INFO - latest_issue_number_in_database is: (25030,)
+2025-03-25 13:34:02 - DEBUG - Starting new HTTPS connection (1): webapi.sporttery.cn:443
+2025-03-25 13:34:03 - DEBUG - https://webapi.sporttery.cn:443 "GET /gateway/lottery/getHistoryPageListV1.qry?gameNo=85&provinceId=0&pageSize=30&isVerify=1&pageNo=1 HTTP/1.1" 200 9188
+2025-03-25 13:34:05 - INFO - The sql is: 
+            insert into t_bus_daletou (
+                issue,
+                open_prize_date,
+                oprfs_first_number,
+                oprfs_second_number,
+                oprfs_third_number,
+                oprfs_fourth_number,
+                oprfs_fifth_number,
+                oprbs_first_number,
+                oprbs_second_number,
+                fp_base_betting_number,
+                fp_base_prize_monney,
+                fp_append_betting_number,
+                fp_append_prize_monney,
+                sp_base_betting_number,
+                sp_base_prize_monney,
+                sp_append_betting_number,
+                sp_append_prize_monney,
+                salary,
+                prize_pool_monney
+            ) values (
+                25031,
+                '2025-03-24',
+                14,
+                18,
+                20,
+                25,
+                35,
+                01,
+                07,
+                4,
+                10000000,
+                1,
+                8000000,
+                72,
+                247703,
+                20,
+                198162,
+                311643171,
+                1024377872.55
+            )
+2025-03-25 13:34:05 - DEBUG - Starting new HTTPS connection (1): pdf.sporttery.cn:443
+2025-03-25 13:34:05 - DEBUG - https://pdf.sporttery.cn:443 "GET /33800/25031/25031.pdf HTTP/1.1" 200 52591

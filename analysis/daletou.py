@@ -1,9 +1,19 @@
 import matplotlib.pyplot as plt
+from matplotlib import rcParams
+from matplotlib import font_manager
 from collections import Counter
 import random
 import pandas as pd
+import numpy as np
 
 import utils.dbmanager as dbmanager
+
+
+# 设置中文字体
+rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体
+rcParams['axes.unicode_minus'] = False   # 解决负号显示问题
+font_path = '/System/Library/Fonts/STHeiti Light.ttc'  # macOS 示例
+font_prop = font_manager.FontProperties(fname=font_path)
 
 
 def drawing_observation_of_number_distribution_analysis_chart():
@@ -17,7 +27,7 @@ def drawing_observation_of_number_distribution_analysis_chart():
 
     # SECTION - Read history data open prize from database then package data structure
     db = dbmanager.DBManager()
-    sql = "select * from t_bus_daletou"
+    sql = "select * from t_bus_daletou order by issue desc"
     result_data = db.queryall(sql)
     db.close()
 
@@ -37,9 +47,9 @@ def drawing_observation_of_number_distribution_analysis_chart():
         lottery_data.append(open_result_numbers)
 
     # NOTE - The front area number interval division
-    front_intervals = [(1, 3), (4, 7), (8, 11), (12, 15), (16, 19), (20, 23), (24, 27), (28, 31), (32, 35)]
+    front_intervals = [(1, 5), (6, 10), (11, 15), (16, 20), (21, 25), (26, 30), (31, 35)]
     # NOTE - The back area number interval division
-    back_intervals = [(1, 2), (3, 4), (5, 6), (7, 8), (9, 10), (11, 12)]
+    back_intervals = [(1, 4), (4, 8), (8, 12)]
 
     def count_numbers_in_intervals(data, intervals):
         """
@@ -425,7 +435,7 @@ def drawing_analyze_interval_trend_analysis_chart():
         观察每个区间在历史开奖中的出号情况，分析其走势规律，例如某个区间是否连续多期出号较少，那么下期该区间可能有出号反弹的趋势。
     """
     db = dbmanager.DBManager()
-    sql = "select * from t_bus_daletou"
+    sql = "select * from t_bus_daletou order by issue desc limit 10"
     result_data = db.queryall(sql)
     db.close()
 
@@ -438,7 +448,7 @@ def drawing_analyze_interval_trend_analysis_chart():
         lottery_data.append(open_result_numbers)
 
     # 前区号码区间划分
-    front_intervals = [(1, 12), (13, 24), (25, 35)]
+    front_intervals = [(1, 5), (6, 10), (11, 15), (16, 20), (21, 25), (26, 30), (31, 35)]
     # 后区号码区间划分
     back_intervals = [(1, 4), (5, 8), (9, 12)]
 
@@ -470,28 +480,89 @@ def drawing_analyze_interval_trend_analysis_chart():
     back_data = [draw[1] for draw in lottery_data]
     back_trend = analyze_interval_trend(back_data, back_intervals)
 
+    # Drawing The parent pannel
+    plt.figure(figsize=(12, 6)) 
+
     # 绘制前区号码区间走势折线图
-    plt.figure(figsize=(12, 6))
     plt.subplot(1, 2, 1)
     for col in front_trend.columns:
         plt.plot(front_trend[col], label=col)
-    plt.xlabel('期数')
-    plt.ylabel('出号数量')
-    plt.title('前区号码区间走势')
+    plt.xlabel('期数', fontproperties=font_prop)
+    plt.ylabel('出号数量', fontproperties=font_prop)
+    plt.title('前区号码区间走势', fontproperties=font_prop)
     plt.legend()
 
     # 绘制后区号码区间走势折线图
     plt.subplot(1, 2, 2)
     for col in back_trend.columns:
         plt.plot(back_trend[col], label=col)
-    plt.xlabel('期数')
-    plt.ylabel('出号数量')
-    plt.title('后区号码区间走势')
+    plt.xlabel('期数', fontproperties=font_prop)
+    plt.ylabel('出号数量', fontproperties=font_prop)
+    plt.title('后区号码区间走势', fontproperties=font_prop)
     plt.legend()
 
     plt.tight_layout()
     plt.show()
 
+def drawing_thend_analysis_chart_of_even_issue():
+    """
+    :desc:
+        
+    """
+
+    # SECTION - Read history data open prize from database then package data structure
+    db = dbmanager.DBManager()
+    sql = "select * from t_bus_daletou order by issue desc"
+    result_data = db.queryall(sql)
+    db.close()
+
+    # NOTE - Package data structure as follows:
+    # lottery_data = [
+    #     [1, 5, 10, 15, 20, 2, 7],
+    #     [2, 6, 11, 16, 21, 3, 8],
+    #     [3, 7, 12, 17, 22, 4, 9],
+    #     [4, 8, 13, 18, 23, 5, 10]
+    # ]
+
+    lottery_data = []
+    for item in result_data:
+        temp = [item[2], item[3], item[4], item[5], item[6], item[7], item[8]]
+        lottery_data.append(temp)
+
+    # 提取期数
+    periods = np.arange(1, len(lottery_data) + 1)
+
+    # 提取前区和后区号码
+    front_numbers = np.array([data[:5] for data in lottery_data])
+    back_numbers = np.array([data[5:] for data in lottery_data])
+
+    # 创建一个包含两个子图的图形
+    fig, axes = plt.subplots(2, 1, figsize=(10, 8))
+
+    # 绘制前区号码走势图
+    for i in range(5):
+        axes[0].plot(periods, front_numbers[:, i], marker='o', label=f'前区号码 {i + 1}')
+    axes[0].set_title('大乐透前区号码走势图', fontproperties=font_prop)
+    axes[0].set_xlabel('期数', fontproperties=font_prop)
+    axes[0].set_ylabel('号码', fontproperties=font_prop)
+    axes[0].legend()
+    axes[0].grid(True)
+
+    # 绘制后区号码走势图
+    for i in range(2):
+        axes[1].plot(periods, back_numbers[:, i], marker='o', label=f'后区号码 {i + 1}')
+    axes[1].set_title('大乐透后区号码走势图', fontproperties=font_prop)
+    axes[1].set_xlabel('期数', fontproperties=font_prop)
+    axes[1].set_ylabel('号码', fontproperties=font_prop)
+    axes[1].legend()
+    axes[1].grid(True)
+
+    # 调整子图布局
+    plt.tight_layout()
+
+    # 显示图形
+    plt.show()
+
 if __name__ == '__main__':
-    drawing_observation_of_number_distribution_analysis_chart()
-    pass
+    drawing_thend_analysis_chart_of_even_issue()
+    # drawing_observation_of_number_distribution_analysis_chart()
